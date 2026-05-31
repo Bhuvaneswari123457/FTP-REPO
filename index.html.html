@@ -1,0 +1,1482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Indian Freight Platform BOT — WhatsApp Bot Simulator v6</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#f0f2f5;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px;}
+  .wrapper{width:100%;max-width:480px;}
+  .app{border-radius:12px;overflow:hidden;background:#fff;box-shadow:0 4px 24px rgba(0,0,0,0.12);}
+  .topbar{background:#075e54;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+  .brand-name{font-size:14px;font-weight:600;color:#fff;}
+  .brand-sub{font-size:10px;color:#9de3d0;margin-top:1px;}
+  .role-tag{display:flex;align-items:center;gap:5px;background:#054d44;border:0.5px solid #25D366;border-radius:16px;padding:3px 9px;font-size:10px;color:#9de3d0;}
+  .change-btn{color:#fca5a5;font-size:9px;margin-left:4px;cursor:pointer;background:none;border:none;font-family:inherit;}
+  .bot-strip{display:flex;border-bottom:1px solid #e9edef;background:#f0f2f5;}
+  .bot-tab{flex:1;padding:6px 2px;text-align:center;font-size:9px;color:#667781;cursor:pointer;border-right:1px solid #e9edef;transition:background .12s;line-height:1.4;}
+  .bot-tab:last-child{border-right:none;}
+  .bot-tab.active{background:#e8f9f1;color:#085041;font-weight:600;}
+  .bot-tab.locked{opacity:.35;cursor:not-allowed;pointer-events:none;}
+  .bot-tab .ti{font-size:14px;display:block;margin-bottom:1px;}
+  .sec-bar{padding:5px 12px;background:#e8f9f1;border-bottom:1px solid #9FE1CB;font-size:10px;color:#085041;display:flex;align-items:center;gap:5px;}
+  .msgs{height:400px;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px;background:#e5ddd5;}
+  .msg{max-width:88%;display:flex;flex-direction:column;}
+  .msg.bot{align-self:flex-start;}
+  .msg.user{align-self:flex-end;}
+  .bub{padding:8px 11px;border-radius:8px;font-size:12.5px;line-height:1.55;}
+  .msg.bot .bub{background:#fff;color:#111;border-top-left-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.1);}
+  .msg.user .bub{background:#dcf8c6;color:#111;border-top-right-radius:2px;box-shadow:0 1px 2px rgba(0,0,0,.1);}
+  .mt{font-size:9px;color:#667781;margin-top:2px;}
+  .msg.user .mt{text-align:right;}
+  .kbd-area{border-top:1px solid #e9edef;background:#fff;padding:8px 10px;min-height:44px;}
+  .kd-label{font-size:10px;color:#667781;margin-bottom:4px;font-weight:600;}
+  .kd-display{background:#f0f2f5;border:1px solid #d1d7db;border-radius:8px;padding:6px 12px;font-size:17px;font-weight:600;letter-spacing:2px;color:#111;text-align:center;min-height:36px;margin-bottom:6px;}
+  .kd-hint{font-size:10px;color:#667781;text-align:center;margin-bottom:5px;}
+  .keypad-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:4px;}
+  .kbtn{padding:10px 4px;border:1px solid #d1d7db;border-radius:8px;background:#fff;font-size:15px;font-weight:600;color:#111;cursor:pointer;text-align:center;transition:background .1s,transform .08s;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;-webkit-tap-highlight-color:transparent;font-family:inherit;}
+  .kbtn:hover{background:#f0f2f5;}
+  .kbtn:active{transform:scale(.93);background:#e9edef;}
+  .kbtn.del{color:#a32d2d;font-size:13px;}
+  .kbtn.ok-btn{background:#25D366;color:#fff;border-color:#25D366;font-size:13px;}
+  .kbtn.ok-btn:hover{background:#128C7E;}
+  .kbtn .ksub{font-size:8px;color:#aaa;line-height:1;}
+  .ok-btn .ksub{color:rgba(255,255,255,.7);}
+  .opts-row{display:flex;flex-wrap:wrap;gap:5px;padding:2px 0;}
+  .ob{display:inline-flex;align-items:center;gap:4px;padding:6px 11px;border:1.5px solid #25D366;border-radius:18px;background:#fff;color:#085041;font-size:11.5px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .1s,transform .08s;-webkit-tap-highlight-color:transparent;}
+  .ob:hover{background:#e8f9f1;}
+  .ob:active{transform:scale(.95);}
+  .ob.bl{border-color:#185FA5;color:#0C447C;}.ob.bl:hover{background:#e6f1fb;}
+  .ob.am{border-color:#BA7517;color:#633806;}.ob.am:hover{background:#fff7e0;}
+  .ob.rd{border-color:#A32D2D;color:#791F1F;}.ob.rd:hover{background:#fcebeb;}
+  .ob.pu{border-color:#534AB7;color:#3C3489;}.ob.pu:hover{background:#EEEDFE;}
+  .ob.gr{border-color:#667781;color:#3b4a51;}.ob.gr:hover{background:#f0f2f5;}
+  .typing{display:flex;align-items:center;gap:3px;padding:7px 9px;background:#fff;border-radius:8px;border-top-left-radius:2px;align-self:flex-start;box-shadow:0 1px 2px rgba(0,0,0,.1);}
+  .td{width:6px;height:6px;border-radius:50%;background:#aaa;animation:tb 1.1s infinite ease-in-out;}
+  .td:nth-child(2){animation-delay:.2s;}.td:nth-child(3){animation-delay:.4s;}
+  @keyframes tb{0%,80%,100%{transform:translateY(0);opacity:.4;}40%{transform:translateY(-5px);opacity:1;}}
+  .card{border-radius:8px;padding:8px 10px;margin-top:4px;font-size:11.5px;line-height:1.75;}
+  .cg{background:#f7fdf9;border:1px solid #9FE1CB;color:#085041;}
+  .cb{background:#EBF4FD;border:1px solid #85B7EB;color:#0C447C;}
+  .ca{background:#FEF6E4;border:1px solid #FAC775;color:#633806;}
+  .cp{background:#EEEDFE;border:1px solid #AFA9EC;color:#3C3489;}
+  .cg2{background:#f2f9f5;border:1px solid #b0d8c4;color:#085041;}
+  .cr{background:#FCEBEB;border:1px solid #E8AAAA;color:#791F1F;}
+  .chip{display:inline-flex;align-items:center;gap:2px;padding:2px 7px;border-radius:10px;font-size:10px;font-weight:600;}
+  .chg{background:#e8f9f1;color:#0F6E56;}.chb{background:#e6f1fb;color:#185FA5;}.cha{background:#fff7e0;color:#854F0B;}.chr{background:#fcebeb;color:#a32d2d;}.chp{background:#EEEDFE;color:#3C3489;}
+  .otp-box{background:#FFF8E0;border:1.5px solid #FAC775;border-radius:10px;padding:10px;margin-top:6px;text-align:center;font-size:11px;color:#633806;}
+  .otp-num{font-size:24px;font-weight:700;letter-spacing:8px;color:#412402;margin:4px 0;}
+  .divline{border:none;border-top:1px dashed #ccc;margin:5px 0;}
+  .role-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px;}
+  .rc{border:1.5px solid #e9edef;border-radius:12px;padding:14px 6px;text-align:center;cursor:pointer;background:#fff;transition:border-color .15s,background .15s;}
+  .rc:hover{border-color:#25D366;background:#f0fdf6;}
+  .rc-icon{font-size:24px;margin-bottom:5px;}
+  .rc-name{font-size:12px;font-weight:600;color:#111;}
+  .rc-desc{font-size:10px;color:#667781;margin-top:2px;}
+  .otp-boxes{display:flex;gap:8px;justify-content:center;margin-bottom:8px;}
+  .otp-cell{width:44px;height:50px;border:1.5px solid #d1d7db;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#111;background:#f0f2f5;transition:border-color .15s;}
+  .otp-cell.filled{border-color:#25D366;background:#f7fdf9;}
+  .free-bar{display:flex;gap:6px;align-items:center;padding:6px 0 2px;}
+  .free-input{flex:1;border:1.5px solid #d1d7db;border-radius:20px;padding:7px 13px;font-size:13px;font-family:inherit;outline:none;background:#f0f2f5;color:#111;}
+  .free-input:focus{border-color:#25D366;background:#fff;}
+  .free-send{background:#25D366;border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+  .free-send svg{pointer-events:none;}
+  .city-shortcuts{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:5px;}
+  .city-sc{padding:3px 9px;border:1px solid #9FE1CB;border-radius:12px;background:#f0fdf6;color:#085041;font-size:10.5px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .city-sc:hover{background:#d9f5eb;}
+  .star-row{display:flex;gap:6px;margin:6px 0;}
+  .star-btn{font-size:22px;cursor:pointer;opacity:.35;transition:opacity .1s,transform .1s;}
+  .star-btn:hover,.star-btn.sel{opacity:1;transform:scale(1.15);}
+  .withdraw-notice{background:#FFF3CD;border:1px solid #FAC775;border-radius:8px;padding:6px 10px;font-size:10.5px;color:#633806;margin-top:4px;}
+  @keyframes locPing{0%{box-shadow:0 0 0 0 rgba(37,211,102,.4);}70%{box-shadow:0 0 0 10px rgba(37,211,102,0);}100%{box-shadow:0 0 0 0 rgba(37,211,102,0);}}
+  .live-dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:#25D366;animation:locPing 1.5s infinite;vertical-align:middle;margin-right:3px;}
+  .city-text-bar{display:flex;gap:5px;margin-bottom:6px;}
+  .city-text-input{flex:1;border:1.5px solid #25D366;border-radius:20px;padding:6px 12px;font-size:12px;font-family:inherit;outline:none;background:#fff;color:#111;}
+  .city-confirm-btn{background:#25D366;border:none;border-radius:20px;padding:6px 12px;color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .state-chips{display:flex;flex-wrap:wrap;gap:4px;margin:4px 0;}
+  .state-chip{padding:4px 10px;border:1.5px solid #185FA5;border-radius:14px;background:#EBF4FD;color:#0C447C;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;}
+  .state-chip:hover{background:#c8def8;}
+  .corridor-info{font-size:10px;color:#667781;padding:3px 0 5px;border-bottom:1px solid #eee;margin-bottom:4px;}
+  /* Coupon box */
+  .coupon-box{background:#fff3e0;border:2px dashed #FAC775;border-radius:10px;padding:8px 12px;margin-top:6px;text-align:center;font-size:12px;color:#633806;}
+  .coupon-code{font-size:20px;font-weight:800;letter-spacing:5px;color:#412402;margin:4px 0;}
+  /* Trip closed banner */
+  .trip-closed-banner{background:#e8f9f1;border:2px solid #25D366;border-radius:10px;padding:10px 12px;margin-top:6px;text-align:center;font-size:12px;color:#085041;}
+  /* Notification badge */
+  .notif-badge{background:#FF5252;color:#fff;border-radius:10px;padding:1px 6px;font-size:9px;font-weight:700;margin-left:4px;}
+  /* Goods type input */
+  .goods-input-bar{display:flex;gap:5px;margin-bottom:6px;}
+  .goods-text-input{flex:1;border:1.5px solid #25D366;border-radius:20px;padding:6px 12px;font-size:12px;font-family:inherit;outline:none;background:#fff;color:#111;}
+  /* Save template card */
+  .template-card{background:#EEEDFE;border:1px solid #AFA9EC;border-radius:9px;padding:9px 12px;margin-top:5px;font-size:11.5px;color:#3C3489;}
+  /* High traffic notice */
+  .traffic-notice{background:#FFF3CD;border:1.5px solid #FAC775;border-radius:8px;padding:7px 10px;font-size:11px;color:#633806;margin-top:5px;}
+</style>
+</head>
+<body>
+<div class="wrapper">
+  <div style="text-align:center;margin-bottom:12px;">
+    <div style="font-size:11px;color:#667781;">🇮🇳 Indian Freight Platform — WhatsApp Bot Simulator v6.0</div>
+  </div>
+  <div class="app">
+    <div class="topbar">
+      <div>
+        <div class="brand-name">🚛 Indian Freight Platform</div>
+        <div class="brand-sub" id="sub-lbl">Select your role</div>
+      </div>
+      <div id="top-tag"></div>
+    </div>
+    <div class="bot-strip">
+      <div class="bot-tab locked" id="tab1"><span class="ti">🔐</span>Bot 1<br>KYC</div>
+      <div class="bot-tab locked" id="tab2"><span class="ti">🚛</span>Bot 2<br>Avail.</div>
+      <div class="bot-tab locked" id="tab3"><span class="ti">🏪</span>Bot 3<br>Market</div>
+      <div class="bot-tab locked" id="tab4"><span class="ti">📦</span>Bot 4<br>Shipper</div>
+      <div class="bot-tab locked" id="tab5"><span class="ti">🧾</span>Bot 5<br>Billing</div>
+    </div>
+    <div class="sec-bar">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#0F6E56" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      <span id="sec-txt">Select role · DigiLocker verification required</span>
+    </div>
+    <div class="msgs" id="msgs"></div>
+    <div class="kbd-area" id="kbd-area"></div>
+  </div>
+  <div style="text-align:center;margin-top:10px;font-size:10px;color:#aaa;">Indian Freight Platform v6.0 · April 2026 · Confidential</div>
+</div>
+
+<script>
+(function(){
+var ROLE=null,BOT=0;
+var S={
+  kycDone:false,availSet:false,loadPosted:false,tripActive:false,
+  src:'',srcState:'',dst:'',dstState:'',
+  truckType:'',truckSize:'',truckCapacity:'',
+  pmin:'',pmax:'',
+  loadDesc:'',loadGoodsType:'',loadWeight:'',loadTruckType:'',
+  smin:'',smax:'',
+  matchedPrice:0,matchedLoad:'',currentLoadId:'',
+  liveLocationOn:true,
+  withdrawTimer:null,
+  savedTemplates:[],
+  tripClosedNotified:false,
+  disputeWindow:false,
+  disputeTimer:null
+};
+
+var CITY_STATES={
+  'Hyderabad':['Telangana'],
+  'Bangalore':['Karnataka'],
+  'Mumbai':['Maharashtra'],
+  'Pune':['Maharashtra'],
+  'Chennai':['Tamil Nadu'],
+  'Delhi':['Delhi'],
+  'Kolkata':['West Bengal'],
+  'Ahmedabad':['Gujarat'],
+  'Nagpur':['Maharashtra'],
+  'Vizag':['Andhra Pradesh'],
+  'Kochi':['Kerala'],
+  'Jaipur':['Rajasthan'],
+  'Lucknow':['Uttar Pradesh'],
+  'Bhopal':['Madhya Pradesh'],
+  'Patna':['Bihar'],
+  'Chandigarh':['Punjab','Haryana'],
+  'Bhubaneswar':['Odisha'],
+  'Guwahati':['Assam'],
+  'Indore':['Madhya Pradesh'],
+  'Coimbatore':['Tamil Nadu']
+};
+
+var CORRIDORS=[
+  'Hyderabad-Mumbai','Hyderabad-Bangalore','Hyderabad-Chennai','Hyderabad-Pune',
+  'Mumbai-Delhi','Mumbai-Bangalore','Mumbai-Chennai','Mumbai-Pune',
+  'Delhi-Kolkata','Delhi-Jaipur','Delhi-Lucknow','Delhi-Chandigarh',
+  'Bangalore-Chennai','Bangalore-Kochi','Bangalore-Coimbatore',
+  'Chennai-Vizag','Kolkata-Patna','Ahmedabad-Mumbai','Nagpur-Mumbai','Indore-Mumbai'
+];
+
+function ts(){var d=new Date();return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');}
+function addMsg(type,html){
+  var a=document.getElementById('msgs');
+  var d=document.createElement('div');d.className='msg '+type;
+  var b=document.createElement('div');b.className='bub';b.innerHTML=html;
+  var m=document.createElement('div');m.className='mt';m.textContent=ts()+(type==='user'?' ✓✓':'');
+  d.appendChild(b);d.appendChild(m);a.appendChild(d);a.scrollTop=a.scrollHeight;
+}
+function showTyping(){var a=document.getElementById('msgs');var d=document.createElement('div');d.id='ty';d.className='typing';d.innerHTML='<div class="td"></div><div class="td"></div><div class="td"></div>';a.appendChild(d);a.scrollTop=a.scrollHeight;}
+function rmT(){var t=document.getElementById('ty');if(t)t.remove();}
+function say(html,kbdFn,ms){showTyping();setTimeout(function(){rmT();addMsg('bot',html);if(kbdFn)kbdFn();},ms||900);}
+function setSec(t){document.getElementById('sec-txt').textContent=t;}
+function setSub(t){document.getElementById('sub-lbl').textContent=t;}
+function setTopTag(icon,name){
+  var div=document.getElementById('top-tag');div.innerHTML='';
+  var tag=document.createElement('div');tag.className='role-tag';
+  var span=document.createElement('span');span.textContent=icon+' '+name+' ';
+  var btn=document.createElement('button');btn.className='change-btn';btn.textContent='change';
+  btn.addEventListener('click',resetAll);
+  tag.appendChild(span);tag.appendChild(btn);div.appendChild(tag);
+}
+function setTab(n){BOT=n;for(var i=1;i<=5;i++){var e=document.getElementById('tab'+i);if(e)e.classList.toggle('active',i===n);}}
+function unlockTab(n){var e=document.getElementById('tab'+n);if(e)e.classList.remove('locked');}
+function clearKbd(){var area=document.getElementById('kbd-area');area.innerHTML='';appendFreeBar(area);}
+
+function showKbd(mode,cfg){
+  var area=document.getElementById('kbd-area');area.innerHTML='';
+  if(mode==='options'){renderOptsRow(area,cfg.options);}
+  else if(mode==='options+keypad'){renderOptsRow(area,cfg.options);renderNumKbd(area,cfg.label||'',cfg.hint||'',cfg.maxLen||8,cfg.onSubmit);}
+  else if(mode==='numeric'){renderNumKbd(area,cfg.label||'',cfg.hint||'',cfg.maxLen||12,cfg.onSubmit);}
+  else if(mode==='otp'){renderOtpKbd(area,cfg.label||'OTP',cfg.onSubmit);}
+  else if(mode==='city'){renderCityInput(area,cfg.role,cfg.onConfirm);}
+  else if(mode==='text'){renderTextInput(area,cfg.label||'',cfg.placeholder||'',cfg.onSubmit);}
+  appendFreeBar(area);
+}
+
+function appendFreeBar(area){
+  var wrap=document.createElement('div');wrap.className='free-bar';
+  /* ← Back button */
+  var backBtn=document.createElement('button');
+  backBtn.title='Go back';
+  backBtn.style.cssText='background:#f0f2f5;border:1.5px solid #d1d7db;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:15px;color:#667781;';
+  backBtn.innerHTML='←';
+  backBtn.addEventListener('click',function(){goBack();});
+  var inp=document.createElement('input');inp.type='text';inp.className='free-input';inp.placeholder='Type a message…';
+  var btn=document.createElement('button');btn.className='free-send';btn.title='Send';
+  btn.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>';
+  function doSend(){var v=inp.value.trim();if(!v)return;addMsg('user',v);inp.value='';handleFreeText(v);}
+  btn.addEventListener('click',doSend);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')doSend();});
+  wrap.appendChild(backBtn);wrap.appendChild(inp);wrap.appendChild(btn);area.appendChild(wrap);
+}
+
+/* ─── TEXT INPUT for goods type ─── */
+function renderTextInput(area,label,placeholder,onSubmit){
+  if(label){var l=document.createElement('div');l.className='kd-label';l.textContent=label;area.appendChild(l);}
+  var bar=document.createElement('div');bar.style.cssText='display:flex;gap:5px;margin-bottom:6px;';
+  var inp=document.createElement('input');inp.type='text';inp.className='goods-text-input';inp.placeholder=placeholder||'Type here…';
+  var btn=document.createElement('button');btn.className='city-confirm-btn';btn.textContent='→ OK';
+  function tryConfirm(){var v=inp.value.trim();if(!v)return;clearKbd();onSubmit(v);}
+  btn.addEventListener('click',tryConfirm);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')tryConfirm();});
+  bar.appendChild(inp);bar.appendChild(btn);area.appendChild(bar);
+}
+
+/* ─── CITY INPUT ─── */
+function renderCityInput(area,roleLabel,onConfirm){
+  var label=document.createElement('div');label.className='kd-label';label.textContent='Enter '+roleLabel+' city:';area.appendChild(label);
+  var textBar=document.createElement('div');textBar.className='city-text-bar';
+  var inp=document.createElement('input');inp.type='text';inp.className='city-text-input';inp.placeholder='e.g. Hyderabad, Mumbai…';
+  var confirmBtn=document.createElement('button');confirmBtn.className='city-confirm-btn';confirmBtn.textContent='→ Confirm';
+  textBar.appendChild(inp);textBar.appendChild(confirmBtn);area.appendChild(textBar);
+  var scRow=document.createElement('div');scRow.className='city-shortcuts';
+  ['Hyderabad','Mumbai','Chennai','Delhi','Bangalore','Pune','Kolkata','Ahmedabad'].forEach(function(c){
+    var b=document.createElement('button');b.className='city-sc';b.textContent='📍 '+c;
+    b.addEventListener('click',function(){inp.value=c;inp.focus();});
+    scRow.appendChild(b);
+  });
+  area.appendChild(scRow);
+  function tryConfirm(){
+    var city=inp.value.trim();if(!city){inp.focus();return;}
+    var matched=null;
+    Object.keys(CITY_STATES).forEach(function(k){if(k.toLowerCase()===city.toLowerCase())matched=k;});
+    if(!matched){Object.keys(CITY_STATES).forEach(function(k){if(k.toLowerCase().indexOf(city.toLowerCase())===0)matched=k;});}
+    if(!matched){matched=city.charAt(0).toUpperCase()+city.slice(1);}
+    var states=CITY_STATES[matched]||[];
+    if(states.length>1){
+      var area2=document.getElementById('kbd-area');area2.innerHTML='';
+      var lbl2=document.createElement('div');lbl2.className='kd-label';lbl2.textContent='Which '+matched+'? Select state:';area2.appendChild(lbl2);
+      var chips=document.createElement('div');chips.className='state-chips';
+      states.forEach(function(st){
+        var c=document.createElement('button');c.className='state-chip';c.textContent=st;
+        c.addEventListener('click',function(){addMsg('user','📍 '+matched+', '+st);onConfirm(matched,st);appendFreeBar(document.getElementById('kbd-area'));});
+        chips.appendChild(c);
+      });
+      area2.appendChild(chips);appendFreeBar(area2);
+    } else {
+      var state=states[0]||'';
+      addMsg('user','📍 '+matched+(state?', '+state:''));
+      onConfirm(matched,state);
+    }
+  }
+  confirmBtn.addEventListener('click',tryConfirm);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')tryConfirm();});
+}
+
+/* ─── CONTEXTUAL FREE TEXT HANDLER ─── */
+function handleFreeText(v){
+  var low=v.toLowerCase();
+
+  // Goods parsing for shipper
+  var goodsKeywords={
+    'steel':['steel','coil','iron','metal','rod','beam'],
+    'auto parts':['auto','spare','part','vehicle','engine','gear'],
+    'fmcg':['fmcg','grocery','food','consumer','biscuit','soap','shampoo'],
+    'granite':['granite','marble','stone','slab'],
+    'cotton':['cotton','textile','fabric','cloth','yarn'],
+    'cement':['cement','concrete','sand','gravel'],
+    'chemicals':['chemical','acid','solvent','paint','resin'],
+    'electronics':['electronic','mobile','laptop','computer','appliance','tv'],
+    'pharma':['pharma','medicine','drug','tablet','injection'],
+    'fruits/vegetables':['fruit','vegetable','onion','potato','tomato','mango']
+  };
+  if(ROLE==='shipper'&&S.loadPosted===false){
+    var detected=null;
+    Object.keys(goodsKeywords).forEach(function(g){
+      goodsKeywords[g].forEach(function(kw){if(low.indexOf(kw)>=0)detected=g;});
+    });
+    if(detected){
+      S.loadGoodsType=detected;
+      say('📦 Detected goods type: <b>'+detected+'</b><br><div class="card cg">✅ Goods type parsed from your message<br>Proceeding with <b>'+detected+'</b> as load type.</div>',function(){
+        S.loadDesc=detected;shipperWeight();
+      });return;
+    }
+  }
+
+  // Back-step navigation
+  if(low.indexOf('back')>=0||low.indexOf('prev')>=0||low==='undo'||low==='go back'){
+    goBack();return;
+  }
+
+  // Receiver contextual replies
+  if(ROLE==='receiver'){
+    if(low.indexOf('where')>=0||low.indexOf('location')>=0||low.indexOf('driver')>=0||low.indexOf('track')>=0){
+      say('📍 Driver is currently near <b>Pune bypass</b>, on NH-65.<br><span class="live-dot"></span> Live tracking active · ETA: ~4 hours<br><span style="font-size:10px;color:#667781;">Last updated: just now</span>',function(){
+        showKbd('options',{options:[{t:'✅ Confirm delivery (OTP)',f:receiverOTPEntry}]});
+      });return;
+    }
+    if(low.indexOf('when')>=0||low.indexOf('eta')>=0||low.indexOf('time')>=0){
+      say('⏱️ Expected Delivery: <b>Today ~6:00 PM</b><br>Driver is about <b>4 hours away</b> from your location.<br>You will receive an OTP notification when the driver arrives.',function(){
+        showKbd('options',{options:[{t:'📦 View shipment details',f:receiverDetails}]});
+      });return;
+    }
+    if(low.indexOf('otp')>=0||low.indexOf('code')>=0){
+      say('🔑 The driver will provide you an <b>Unloading OTP</b> upon arrival.<br>Enter it to confirm goods received and release payment to the driver.',function(){
+        showKbd('options',{options:[{t:'✅ Confirm delivery (OTP)',f:receiverOTPEntry}]});
+      });return;
+    }
+    if(low.indexOf('good')>=0||low.indexOf('item')>=0||low.indexOf('cargo')>=0||low.indexOf('shipment')>=0){
+      say('📦 Your incoming shipment:<br><div class="card cb">Goods: <b>'+( S.loadDesc||'Steel Coils')+'</b><br>Weight: <b>'+(S.loadWeight||'22T')+'</b><br>From: <b>'+( S.src||'Hyderabad')+'</b><br>Driver: Suresh Kumar · ⭐ 4.8</div>',function(){
+        showKbd('options',{options:[{t:'📍 Request location',f:function(){addMsg('user','Location update');say('📍 Driver near Pune bypass. ETA: 4 hours.<br><span class="live-dot"></span> Live location active.',function(){showKbd('options',{options:[{t:'✅ Confirm delivery',f:receiverOTPEntry}]});});}},{t:'✅ Confirm delivery',f:receiverOTPEntry,c:'bl'}]});
+      });return;
+    }
+  }
+
+  // Trucker contextual replies
+  if(ROLE==='trucker'){
+    if(low.indexOf('fuel')>=0||low.indexOf('petrol')>=0||low.indexOf('diesel')>=0){
+      showPetrolBunks();return;
+    }
+    if(low.indexOf('load')>=0||low.indexOf('freight')>=0){
+      say('🏪 Looking for loads on your route? Head to Bot 3 — Marketplace.',function(){
+        showKbd('options',{options:[{t:'🏪 Browse Loads',f:startMarket}]});
+      });return;
+    }
+  }
+
+  // Shipper contextual replies
+  if(ROLE==='shipper'){
+    if(low.indexOf('bid')>=0||low.indexOf('driver')>=0){
+      say('🚛 Bids from verified drivers will appear here. You can accept, reject, or wait for more bids.',function(){
+        showKbd('options',{options:[{t:'⚡ Simulate bid received',f:shipperBidIn}]});
+      });return;
+    }
+    if(low.indexOf('track')>=0||low.indexOf('location')>=0){
+      say('📍 <span class="live-dot"></span> Driver is en route. Live tracking is active automatically once the trip starts.',function(){
+        var next=getNextActions();showKbd('options',{options:next});
+      });return;
+    }
+    if(low.indexOf('dispute')>=0){
+      shipperRaiseDispute('transit');return;
+    }
+  }
+
+ var helpKw = ['help','sahayata','madad','support','stuck','problem','issue','confused','kya','how','kaise','Hi','Hello'];
+var isHelp = helpKw.some(function(k){ return low.indexOf(k) >= 0; });
+
+// Array of random responses for non-help inputs
+var randomReplies = [
+  "Got it! Here's what you can do next:",
+  "I see. Here are your options:",
+  "Understood. Choose an option to continue:",
+  "Right on. What's next?"
+];
+
+var next = getNextActions();
+var optionsList = { options: next.concat([{ t: '🔄 Start over', f: resetAll, c: 'rd' }]) };
+
+if (isHelp) {
+    say('🙋 <b>Need help?</b> Here\'s what you can do next:', function() {
+        showKbd('options', optionsList);
+    });
+} else {
+    // Pick a random reply from the array above
+    var randomMsg = randomReplies[Math.floor(Math.random() * randomReplies.length)];
+    
+    say(randomMsg, function() {
+        showKbd('options', optionsList);
+    });
+}
+}
+
+/* ─── BACK STEP ─── */
+function goBack(){
+  if(ROLE==='trucker'){
+    if(S.tripActive){say('↩️ You are in an active trip. Back navigation limited.',function(){showKbd('options',{options:[{t:'✅ Confirm delivery',f:enterUnloadOTP},{t:'⛽ Petrol bunks',f:showPetrolBunks,c:'am'}]});});}
+    else if(S.availSet){say('↩️ Going back to Marketplace.',function(){startMarket();});}
+    else if(S.kycDone){say('↩️ Going back to Availability setup.',function(){startAvail();});}
+    else{say('↩️ Going back to KYC.',function(){startKYC();});}
+  } else if(ROLE==='shipper'){
+    if(S.loadPosted){say('↩️ Going back to load posting.',function(){shipperGoods();});}
+    else{say('↩️ Going back to start.',function(){startShipperKYC();});}
+  } else if(ROLE==='receiver'){
+    say('↩️ Going back to shipment view.',function(){receiverDetails();});
+  } else {
+    say('↩️ Going back to role selection.',function(){resetAll();});
+  }
+}
+
+function getNextActions(){
+  if(!ROLE) return [{t:'🙏 Start over',f:resetAll}];
+  if(ROLE==='trucker'){
+    if(!S.kycDone) return [{t:'🔐 Complete KYC',f:startKYC}];
+    if(!S.availSet) return [{t:'🚛 Set Availability',f:startAvail}];
+    if(!S.tripActive) return [{t:'🏪 Browse Loads',f:startMarket},{t:'✏️ Update availability',f:startAvail,c:'bl'}];
+    return [{t:'✅ Confirm delivery',f:enterUnloadOTP},{t:'⛽ Petrol bunks',f:showPetrolBunks,c:'am'}];
+  }
+  if(ROLE==='shipper'){
+    if(!S.loadPosted) return [{t:'📦 Post a load',f:shipperGoods}];
+    return [{t:'⚡ Simulate bid received',f:shipperBidIn}];
+  }
+  if(ROLE==='receiver'){
+    return [{t:'📦 View shipment',f:receiverDetails}];
+  }
+  return [{t:'🙏 Start over',f:resetAll}];
+}
+
+function renderOptsRow(area,options){
+  var wrap=document.createElement('div');wrap.className='opts-row';
+  options.forEach(function(o){
+    var b=document.createElement('button');b.className='ob'+(o.c?' '+o.c:'');b.innerHTML=o.t;
+    b.addEventListener('click',function(){clearKbd();o.f();});wrap.appendChild(b);
+  });
+  area.appendChild(wrap);
+}
+
+function renderNumKbd(area,label,hint,maxLen,onSubmit){
+  if(label){var l=document.createElement('div');l.className='kd-label';l.textContent=label;area.appendChild(l);}
+  var disp=document.createElement('div');disp.className='kd-display';disp.id='kd-val';area.appendChild(disp);
+  if(hint){var h=document.createElement('div');h.className='kd-hint';h.textContent=hint;area.appendChild(h);}
+  var grid=document.createElement('div');grid.className='keypad-grid';
+  var val='';
+  var keys=[{k:'1',s:''},{k:'2',s:'ABC'},{k:'3',s:'DEF'},{k:'4',s:'GHI'},{k:'5',s:'JKL'},{k:'6',s:'MNO'},{k:'7',s:'PQRS'},{k:'8',s:'TUV'},{k:'9',s:'WXYZ'},{k:'⌫',s:''},{k:'0',s:'+'},{k:'✓',s:'Send'}];
+  keys.forEach(function(kd){
+    var b=document.createElement('button');
+    b.className='kbtn'+(kd.k==='⌫'?' del':kd.k==='✓'?' ok-btn':'');
+    b.innerHTML=kd.k+(kd.s?'<div class="ksub">'+kd.s+'</div>':'');
+    b.addEventListener('click',function(){
+      if(kd.k==='⌫'){val=val.slice(0,-1);}
+      else if(kd.k==='✓'){if(val.length>0){var v=val;clearKbd();onSubmit(v);}return;}
+      else{if(val.length<maxLen)val+=kd.k;}
+      var dv=document.getElementById('kd-val');if(dv)dv.textContent=val||'';
+    });
+    grid.appendChild(b);
+  });
+  area.appendChild(grid);
+}
+
+function renderOtpKbd(area,label,onSubmit){
+  var lbl=document.createElement('div');lbl.className='kd-label';lbl.textContent='Enter '+label;area.appendChild(lbl);
+  var boxes=document.createElement('div');boxes.className='otp-boxes';
+  var len=4,val='';
+  for(var i=0;i<len;i++){var box=document.createElement('div');box.className='otp-cell';box.id='oc'+i;boxes.appendChild(box);}
+  area.appendChild(boxes);
+  var grid=document.createElement('div');grid.className='keypad-grid';
+  ['1','2','3','4','5','6','7','8','9','⌫','0','✓'].forEach(function(k){
+    var b=document.createElement('button');
+    b.className='kbtn'+(k==='⌫'?' del':k==='✓'?' ok-btn':'');
+    b.textContent=k;
+    b.addEventListener('click',function(){
+      if(k==='⌫'){val=val.slice(0,-1);}
+      else if(k==='✓'){if(val.length===len){clearKbd();onSubmit(val);}return;}
+      else{if(val.length<len)val+=k;}
+      for(var j=0;j<len;j++){var el=document.getElementById('oc'+j);if(!el)continue;el.textContent=val[j]||'';el.className='otp-cell'+(val[j]?' filled':'');}
+    });
+    grid.appendChild(b);
+  });
+  area.appendChild(grid);
+}
+
+function renderStarRating(area,label,onRate){
+  var lbl=document.createElement('div');lbl.className='kd-label';lbl.textContent=label;area.appendChild(lbl);
+  var row=document.createElement('div');row.className='star-row';
+  var sel=0;
+  for(var i=1;i<=5;i++){
+    (function(n){
+      var s=document.createElement('span');s.className='star-btn';s.textContent='⭐';s.dataset.n=n;
+      s.addEventListener('click',function(){
+        sel=n;
+        area.querySelectorAll('.star-btn').forEach(function(x){x.classList.toggle('sel',parseInt(x.dataset.n)<=sel);});
+        setTimeout(function(){clearKbd();onRate(sel);},400);
+      });
+      row.appendChild(s);
+    })(i);
+  }
+  area.appendChild(row);
+}
+
+function resetAll(){
+  ROLE=null;BOT=0;
+  if(S.withdrawTimer)clearTimeout(S.withdrawTimer);
+  if(S.disputeTimer)clearTimeout(S.disputeTimer);
+  Object.keys(S).forEach(function(k){
+    if(k==='withdrawTimer'||k==='disputeTimer')S[k]=null;
+    else if(k==='savedTemplates')S[k]=[];
+    else if(typeof S[k]==='boolean')S[k]=false;
+    else if(k==='matchedPrice')S[k]=0;
+    else if(k==='liveLocationOn')S[k]=true;
+    else S[k]='';
+  });
+  document.getElementById('msgs').innerHTML='';
+  clearKbd();document.getElementById('top-tag').innerHTML='';
+  setSub('Select your role');setSec('Select role · DigiLocker verification required');
+  for(var i=1;i<=5;i++){var e=document.getElementById('tab'+i);if(e)e.className='bot-tab locked';}
+  setTimeout(startScreen,80);
+}
+
+function startScreen(){
+  var a=document.getElementById('msgs');
+  var d=document.createElement('div');d.className='msg bot';
+  var bub=document.createElement('div');bub.className='bub';
+  bub.innerHTML='🙏 <b>Namaste!</b> Welcome to <b>Indian Freight Platform</b>.<br>One interface for all roles in the freight chain.<br>Who are you today?';
+  var grid=document.createElement('div');grid.className='role-grid';
+  [{r:'trucker',icon:'🚛',name:'Trucker',desc:'Driver / Lorry owner'},
+   {r:'shipper',icon:'📦',name:'Shipper',desc:'Load supplier'},
+   {r:'receiver',icon:'🏠',name:'Receiver',desc:'Delivery recipient'}].forEach(function(role){
+    var rc=document.createElement('div');rc.className='rc';
+    rc.innerHTML='<div class="rc-icon">'+role.icon+'</div><div class="rc-name">'+role.name+'</div><div class="rc-desc">'+role.desc+'</div>';
+    rc.addEventListener('click',function(){pickRole(role.r);});
+    grid.appendChild(rc);
+  });
+  bub.appendChild(grid);
+  var mt=document.createElement('div');mt.className='mt';mt.textContent=ts();
+  d.appendChild(bub);d.appendChild(mt);a.appendChild(d);a.scrollTop=a.scrollHeight;
+  var kbdArea=document.getElementById('kbd-area');kbdArea.innerHTML='';appendFreeBar(kbdArea);
+}
+
+function pickRole(r){
+  ROLE=r;
+  var icons={trucker:'🚛',shipper:'📦',receiver:'🏠'};
+  var names={trucker:'Trucker',shipper:'Shipper',receiver:'Receiver'};
+  addMsg('user',icons[r]+' '+names[r]);
+  setTopTag(icons[r],names[r]);setSub(names[r]+' mode');
+  if(r==='trucker'){unlockTab(1);setTab(1);startKYC();}
+  else if(r==='shipper'){unlockTab(1);unlockTab(4);setTab(4);startShipperKYC();}
+  else{unlockTab(1);setTab(1);startReceiverKYC();}
+}
+
+/* ═══════════════════════════════════════
+   BOT 1 — KYC (TRUCKER)
+═══════════════════════════════════════ */
+function startKYC(){
+  setSec('🔐 Bot 1 — KYC: Enter Driving Licence number');
+  say('🔐 <b>Bot 1 — KYC & Authentication</b><br><br>Enter your <b>Driving Licence number</b>:',function(){
+    showKbd('numeric',{label:'Driving Licence No.',hint:'e.g. TG0420220012345',maxLen:15,onSubmit:function(v){
+      addMsg('user','🪪 DL: '+v);
+      say('DL <b>'+v+'</b> received.<br>Verify via <b>DigiLocker</b> to fetch your documents automatically.',function(){
+        showKbd('options',{options:[{t:'🔗 Open DigiLocker',f:digiFlow},{t:'📷 Manual upload (fallback)',f:manualKYC,c:'bl'}]});
+      });
+    }});
+  });
+}
+
+function digiFlow(){
+  say('🔐 <b>DigiLocker OAuth</b> initiated…<br><span style="color:#128C7E;">🔗 digilocker.gov.in/auth?ref=IFP-BOT1</span><br><br>Fetching: 📄 DL &nbsp;📄 RC Book &nbsp;📄 Fitness Cert',function(){
+    showKbd('options',{options:[{t:'✅ I have authorised DigiLocker',f:digiSuccess}]});
+  });
+}
+
+function digiSuccess(){
+  showTyping();
+  setTimeout(function(){
+    rmT();addMsg('bot','⏳ Fetching documents from DigiLocker…');showTyping();
+    setTimeout(function(){
+      rmT();S.kycDone=true;unlockTab(2);setTab(2);
+      setSec('✅ KYC complete — Bot 2 Availability unlocked');
+      addMsg('bot','✅ <span class="chip chg">All documents verified</span>'+
+        '<div class="card cg">📄 <b>Driving Licence</b> — <span class="chip chg">✅ Valid</span> · Exp 2029<br>'+
+        '📄 <b>RC Book</b> — <span class="chip chg">✅ Valid</span> · Exp 2027<br>'+
+        '📄 <b>Fitness Certificate</b> — <span class="chip chg">✅ Valid</span> · Exp Dec 2025<br>'+
+        '<div class="divline"></div>🛡️ Verified flag set on driver profile</div>');
+      showKbd('options',{options:[{t:'🚛 Set Availability → Bot 2',f:startAvail}]});
+    },1300);
+  },700);
+}
+
+function manualKYC(){
+  say('📷 Upload DL, RC Book & Fitness Certificate.<br><span class="chip cha">📋 OCR review · Verification may take time</span>',function(){
+    showKbd('options',{options:[{t:'📤 Simulate document upload',f:function(){
+      addMsg('user','[3 documents uploaded]');
+      say('<span class="chip cha">⏳ OCR extraction in progress…</span>',function(){
+        showKbd('options',{options:[{t:'🔄 Check verification status',f:function(){
+          addMsg('user','Check status');S.kycDone=true;unlockTab(2);setTab(2);
+          setSec('✅ KYC complete (manual) — Bot 2 unlocked');
+          say('✅ <span class="chip chg">Manually verified</span> Documents approved.',function(){
+            showKbd('options',{options:[{t:'🚛 Set Availability → Bot 2',f:startAvail}]});
+          });
+        }}]});
+      });
+    }}]});
+  });
+}
+
+/* ═══════════════════════════════════════
+   BOT 2 — AVAILABILITY (TRUCKER)
+═══════════════════════════════════════ */
+function startAvail(){
+  setTab(2);setSec('🚛 Bot 2 — Availability: Route + Truck + Price range');
+  say('🚛 <b>Bot 2 — Availability</b><br>Trucker only · Declare route & price range.<br><br>📍 Enter or type your <b>source city</b>:',function(){
+    showKbd('city',{role:'source',onConfirm:function(city,state){
+      S.src=city;S.srcState=state;pickDest();
+    }});
+  });
+}
+
+function pickDest(){
+  say('<b>'+S.src+(S.srcState?', '+S.srcState:'')+'</b> selected ✅<br><br>📍 Now enter <b>destination city</b>:',function(){
+    showKbd('city',{role:'destination',onConfirm:function(city,state){
+      S.dst=city;S.dstState=state;checkCorridor();
+    }});
+  });
+}
+
+function checkCorridor(){
+  var key1=S.src+'-'+S.dst;var key2=S.dst+'-'+S.src;
+  var supported=CORRIDORS.indexOf(key1)>=0||CORRIDORS.indexOf(key2)>=0;
+  var route=S.src+(S.srcState?', '+S.srcState:'')+' → '+S.dst+(S.dstState?', '+S.dstState:'');
+  if(!supported){
+    say('⚠️ <b>Corridor Notice</b><br>Route <b>'+route+'</b> is not in our current supported corridors.<br><div class="card ca">We currently support major inter-state routes. This corridor may be added soon.<br>You can proceed, but load availability may be limited.</div>',function(){
+      showKbd('options',{options:[{t:'✅ Continue anyway',f:pickTruckType},{t:'🔄 Change route',f:startAvail,c:'bl'}]});
+    });
+  } else {
+    say('✅ <b>Route confirmed:</b> '+route+'<br><span class="chip chg">✅ Active corridor</span>',function(){pickTruckType();});
+  }
+}
+
+function pickTruckType(){
+  say('Select your <b>truck type</b>:',function(){
+    showKbd('options',{options:[
+      {t:'🚚 Closed Container',f:function(){S.truckType='Closed Container';addMsg('user','🚚 Closed Container');pickTruckSize();}},
+      {t:'🚜 Open Body Truck',f:function(){S.truckType='Open Body';addMsg('user','🚜 Open Body');pickTruckSize();}},
+      {t:'🛻 Mini truck / LCV',f:function(){S.truckType='Mini';addMsg('user','🛻 Mini truck');pickTruckSize();}},
+     {t:'🚜 Flatbed / Open body',f:function(){S.truckType='Flatbed';addMsg('user','🚜 Flatbed');pickTruckSize();}},
+
+    ]});
+  });
+}
+
+function pickTruckSize(){
+  say('Select <b>container / body size</b>:',function(){
+    showKbd('options',{options:[
+      {t:'📏 10 ft',f:function(){S.truckSize='10ft';addMsg('user','📏 10ft');pickTruckCapacity();}},
+      {t:'📏 17 ft',f:function(){S.truckSize='17ft';addMsg('user','📏 17ft');pickTruckCapacity();}},
+      {t:'📏 20 ft ⭐',f:function(){S.truckSize='20ft';addMsg('user','📏 20ft');pickTruckCapacity();},c:'bl'},
+      {t:'📏 32 ft / 40 ft',f:function(){S.truckSize='40ft';addMsg('user','📏 40ft');pickTruckCapacity();}},
+      {t:'✏️ Enter manually',f:function(){
+        addMsg('user','Enter size manually');
+        say('Type your <b>container / body size</b>:',function(){
+          showKbd('text',{label:'Container / Body size',placeholder:'e.g. 24ft, 48ft, 32ft…',onSubmit:function(v){
+            S.truckSize=v;addMsg('user','📏 '+v);pickTruckCapacity();
+          }});
+        });
+      },c:'gr'}
+    ]});
+  });
+}
+
+function pickTruckCapacity(){
+  say('Select your truck\'s <b>load capacity</b> (tonnes):',function(){
+    showKbd('options',{options:[
+      {t:'⚖️ Up to 3T',f:function(){S.truckCapacity='3T';addMsg('user','⚖️ 3T');enterPriceRange();}},
+      {t:'⚖️ 7–10T',f:function(){S.truckCapacity='10T';addMsg('user','⚖️ 10T');enterPriceRange();}},
+      {t:'⚖️ 15–18T',f:function(){S.truckCapacity='18T';addMsg('user','⚖️ 18T');enterPriceRange();}},
+      {t:'⚖️ 20–22T',f:function(){S.truckCapacity='22T';addMsg('user','⚖️ 22T');enterPriceRange();}},
+      {t:'⚖️ 28–35T',f:function(){S.truckCapacity='35T';addMsg('user','⚖️ 35T');enterPriceRange();}},
+      {t:'✏️ Enter manually',f:function(){
+        addMsg('user','Enter capacity manually');
+        say('Enter your truck\'s <b>load capacity</b> in tonnes:',function(){
+          showKbd('numeric',{label:'Load capacity (tonnes)',hint:'e.g. 15, 22, 35',maxLen:4,onSubmit:function(v){
+            S.truckCapacity=v+'T';addMsg('user','⚖️ '+v+'T');enterPriceRange();
+          }});
+        });
+      },c:'gr'}
+    ]});
+  });
+}
+
+function enterPriceRange(){
+  say('Enter your <b>minimum ask price</b> (₹) for this trip:<br><span style="font-size:11px;color:#667781;">Your floor rate — for matching only, not shown to shippers</span>',function(){
+    showKbd('numeric',{label:'Min ask price (₹)',hint:'Your lowest acceptable amount',maxLen:8,onSubmit:function(v){
+      S.pmin=v;addMsg('user','Min: ₹'+v);
+      say('Min set to <b>₹'+v+'</b>. Now enter your <b>maximum ask price</b>:',function(){
+        showKbd('numeric',{label:'Max ask price (₹)',hint:'Your highest expected amount',maxLen:8,onSubmit:function(mx){
+          S.pmax=mx;addMsg('user','Max: ₹'+mx);postAvail();
+        }});
+      });
+    }});
+  });
+}
+
+function postAvail(){
+  S.availSet=true;unlockTab(3);setTab(3);
+  setSec('✅ Availability posted — Bot 3 Marketplace unlocked');
+  if(S.withdrawTimer)clearTimeout(S.withdrawTimer);
+  S.withdrawTimer=setTimeout(function(){
+    if(S.availSet&&!S.tripActive){
+      S.availSet=false;
+      addMsg('bot','⏰ <b>Auto-withdrawal</b><br><span class="chip cha">Your availability listing has been automatically withdrawn after 24 hours.</span> Please re-declare if you are still available.');
+    }
+  },24000);
+  say('✅ <span class="chip chg">Availability posted</span>'+
+    '<div class="card cg">🚛 <b>'+S.src+(S.srcState?', '+S.srcState:'')+' → '+S.dst+(S.dstState?', '+S.dstState:'')+'</b><br>'+
+    'Truck: '+S.truckType+' · '+S.truckSize+' · '+S.truckCapacity+'<br>'+
+    '<div class="divline"></div>'+
+    '<div class="withdraw-notice">⏰ Listing auto-expires after <b>24 hours</b>. Extend or re-declare anytime.</div>'+
+    '💾 Saved · Matching loads in marketplace</div>',function(){
+    showKbd('options',{options:[
+      {t:'🏪 Browse loads → Bot 3',f:startMarket},
+      {t:'✏️ Update price range',f:enterPriceRange,c:'bl'},
+      {t:'❌ Withdraw now',f:function(){
+        S.availSet=false;if(S.withdrawTimer)clearTimeout(S.withdrawTimer);
+        addMsg('user','Withdraw availability');
+        say('<span class="chip cha">Availability withdrawn.</span>',function(){
+          showKbd('options',{options:[{t:'🔄 Re-declare availability',f:startAvail}]});
+        });
+      },c:'rd'}
+    ]});
+  });
+}
+
+/* ═══════════════════════════════════════
+   BOT 3 — MARKETPLACE (TRUCKER)
+═══════════════════════════════════════ */
+function startMarket(){
+  setTab(3);setSec('🏪 Bot 3 — Marketplace: Browse · Bid · Trip lock on win');
+  var route=S.src+' → '+S.dst;
+  // High traffic notification
+  say('🏪 <b>Bot 3 — Load Marketplace</b><br>Loads matching 🚛 <b>'+route+'</b>:<br><br>'+
+    '<div class="traffic-notice">🚦 <b>High Traffic Notice:</b> Driver matching is taking longer than usual on this corridor. Shippers value their time — we will <b>notify you immediately when a match is confirmed</b>. Thank you for your patience.</div><br>'+
+    '<div class="card cg"><b>#HM-2041</b> · Steel Coils · 22T · Closed Container<br><span class="chip chg">✅ Feasible match</span></div>'+
+    '<div class="card cg" style="margin-top:5px;"><b>#HM-2044</b> · Auto Parts · 18T · Open Body<br><span class="chip chg">✅ Feasible match</span></div>'+
+    '<div class="card ca" style="margin-top:5px;"><b>#HM-2047</b> · FMCG Goods · 30T · Open Body<br><span class="chip cha">⚠️ Below your range</span></div>'+
+    '<div style="font-size:10px;color:#667781;margin-top:6px;">ℹ️ Multiple truckers are bidding. A notification is sent the moment your match is confirmed.</div>',
+  function(){
+    showKbd('options',{options:[
+      {t:'💰 Bid on #HM-2041',f:function(){enterBid('HM-2041','Steel Coils');}},
+      {t:'💰 Bid on #HM-2044',f:function(){enterBid('HM-2044','Auto Parts');}},
+      {t:'⚡ Bid both (parallel)',f:bidBoth,c:'bl'}
+    ]});
+  });
+}
+
+function enterBid(id,desc){
+  addMsg('user','💰 Bid '+id);
+  say('<b>#'+id+'</b> — '+desc+'<br><br>Enter your <b>minimum bid</b> (₹):',function(){
+    showKbd('numeric',{label:'Your minimum bid (₹)',hint:'Lowest you will accept',maxLen:8,onSubmit:function(bMin){
+      addMsg('user','Min bid: ₹'+bMin);
+      say('Min bid ₹'+bMin+' noted. Now enter your <b>maximum bid</b> (₹):',function(){
+        showKbd('numeric',{label:'Your maximum bid (₹)',hint:'Highest you are willing to offer',maxLen:8,onSubmit:function(bMax){
+          addMsg('user','Max bid: ₹'+bMax);
+          confirmBid(id,desc,bMin,bMax);
+        }});
+      });
+    }});
+  });
+}
+
+function bidBoth(){
+  addMsg('user','⚡ Bid both simultaneously');
+  say('Bids placed on <b>#HM-2041</b> and <b>#HM-2044</b> in parallel.<br><span style="font-size:10px;color:#667781;">ℹ️ Only one can be assigned. Other auto-cancels on match.<br>You will be notified the moment a match is confirmed.</span>',function(){
+    showKbd('options',{options:[{t:'✅ Simulate match on #HM-2041',f:function(){matchConfirmed('HM-2041','Steel Coils','72000','80000');}}]});
+  });
+}
+
+function confirmBid(id,desc,bMin,bMax){
+  say('✅ <span class="chip chg">Bid placed</span>'+
+    '<div class="card cg"><b>#'+id+'</b> — '+desc+'<br>Your range: ₹'+bMin+' – ₹'+bMax+'<br><span class="chip chb">Pending · Awaiting match confirmation</span></div>'+
+    '<div class="traffic-notice">🚦 High demand on this corridor. Matching may take a few extra minutes.<br>✅ <b>You will receive a notification the moment your match is confirmed.</b></div>',function(){
+    showKbd('options',{options:[{t:'⚡ Simulate match confirmed',f:function(){matchConfirmed(id,desc,bMin,bMax);}}]});
+  });
+}
+
+function matchConfirmed(id, desc, price) {
+  addMsg('user', 'Simulate match');
+  S.tripActive = true; S.matchedPrice = price; S.matchedLoad = desc; S.currentLoadId = id;
+  if (S.withdrawTimer) clearTimeout(S.withdrawTimer);
+  say('🔒 <span class="chip chr">Trip Locked!</span> Match confirmed on <b>#'+id+'</b><br>'+
+    '💵 Agreed Rate: <b>₹'+price+'</b> · 📦 Load: <b>'+desc+'</b><br>'+
+    '<span style="font-size:11px;color:#667781;">All other bids auto-withdrawn. Confirm to proceed to Billing.</span>'+
+    '<div class="card cg" style="margin-top:6px;">🚛 '+( S.truckType||'Closed Container')+' · '+(S.truckSize||'20ft')+'<br>'+
+    '📍 Route: '+(S.src||'–')+' → '+(S.dst||'–')+'<br>⚖️ Capacity: '+(S.truckCapacity||'–')+'</div>',
+  function(){
+    showKbd('options',{options:[
+      {t:'✅ Confirm Trip Lock & Proceed to Billing',f:function(){confirmTripLockAndBill(id,price,desc);}},
+      {t:'🔙 Back to Marketplace',f:startMarket,c:'gr'}
+    ]});
+  });
+}
+function confirmTripLockAndBill(id,price,desc){
+  addMsg('user','✅ Trip confirmed · Proceeding to billing');
+  unlockTab(5);setTab(5);setSec('✅ Trip Locked → Bot 5 Billing activated · OTP handshake');
+  say('🧾 <b>Bot 5 — Billing Activated</b>'+
+    '<div class="card cg">🆔 Trip: <b>#'+id+'</b><br>'+
+    '📍 Pickup: '+(S.src||'Hyderabad')+' Industrial Area, Gate 3<br>'+
+    '📍 Drop: '+(S.dst||'Mumbai')+'<br>'+
+    '👤 Shipper: Ramesh K. · +91 98765 43210<br>'+
+    '💰 Rate: ₹'+price+' · Load: '+desc+'<br>'+
+    '🚛 Truck: '+(S.truckType||'Closed Container')+' · '+(S.truckSize||'20ft')+'<br>'+
+    '<span class="live-dot"></span> Live location: <span class="chip chg">Active by default</span></div><br>'+
+    '📤 <b>Loading OTP</b> — Collect this 4-digit code from the <b>shipper</b> at the gate:'+
+    '<div class="otp-box">🔑 Waiting for Pickup OTP<div class="otp-num">_ _ _ _</div>'+
+    '<span style="font-size:10px;">Ask shipper for the OTP shown on their screen</span></div>',
+  function(){
+    showKbd('options',{options:[{t:'✅ Confirm pickup — Enter Shipper OTP',f:driverEnterLoadingOTP}]});
+  });
+}
+
+
+function driverEnterLoadingOTP() {
+  // 1. Initial instruction to the driver
+  say('📣 <b>Shipper has provided the OTP?</b><br>Please enter the 4-digit <b>Loading OTP</b> to confirm pickup and start the trip:', function() {
+    
+    // 2. Show the numeric OTP keyboard input
+    showKbd('otp', {
+      label: 'Enter 4-Digit OTP',
+      onSubmit: function(val) {
+        // Validation: Logic to check if OTP is correct (using '8842' as the simulation key)
+        if (val === '8842') {
+          addMsg('user', 'Entered OTP: ' + val);
+          
+          // Success Response
+          say('✅ <span class="chip chg">OTP Verified!</span><br>Pickup confirmed. Your trip has officially started. Live location is now being shared with the shipper.', function() {
+            tripTransit(); // Proceeds to the transit/tracking screen
+          });
+          
+        } else {
+          // Failure Response & Retry
+          addMsg('user', 'Entered OTP: ' + val);
+          say('❌ <span class="chip chr">Invalid OTP</span><br>The code you entered does not match. Please ask the shipper for the correct code and try again.', function() {
+            driverEnterLoadingOTP(); // Restart the process
+          });
+        }
+      }
+    });
+  });
+}
+
+/* ═══════════════════════════════════════
+   BOT 5 — TRIP TRANSIT (TRUCKER)
+═══════════════════════════════════════ */
+function tripTransit(){
+  setSec('🚛 Trip in transit · Live location active');
+  say('🚛 <b>Trip started!</b> Drive safe.'+
+    '<div class="card cb">📍 Route: '+S.src+' → '+S.dst+'<br><span class="live-dot"></span> Live location: <span class="chip chg">Sharing automatically</span><br>⏱️ ETA: ~14 hours<br>📣 Status updates sent to shipper & receiver every 3h</div>',function(){
+    showKbd('options',{options:[
+      {t:'✅ Confirm delivery',f:enterUnloadOTP},
+      {t:'⛽ Petrol bunks on route',f:showPetrolBunks,c:'am'},
+      {t:'🆘 Report breakdown',f:function(){addMsg('user','Report breakdown');say('Breakdown reported. Shipper & receiver notified. Live location continues sharing.',function(){showKbd('options',{options:[{t:'🔄 Resume trip',f:tripTransit}]});});},c:'rd'}
+    ]});
+  });
+}
+
+function showPetrolBunks(){
+  addMsg('user','⛽ Petrol bunks on route');
+  say('⛽ <b>Petrol Bunks — '+S.src+' → '+S.dst+' (NH-65 / NH-48)</b>'+
+    '<div class="card ca">'+
+    '📍 <b>Kurnool stretch</b><br>'+
+    '&nbsp;&nbsp;🟡 <b>HP Vijay Fuels</b>, NH-65, Kurnool<br>'+
+    '&nbsp;&nbsp;&nbsp;&nbsp;Diesel ₹93.1/L · 24 hrs · Truck parking · Toilet<br>'+
+    '&nbsp;&nbsp;🔴 <b>BPCL Speed</b>, Nandyal bypass · Diesel ₹92.8/L<br><br>'+
+    '📍 <b>Solapur stretch</b><br>'+
+    '&nbsp;&nbsp;🟢 <b>Indian Oil</b>, Solapur NH-65 · ₹91.5/L · 24 hrs · ATM<br>'+
+    '&nbsp;&nbsp;🟡 <b>HP Ganesh Petro</b>, Akkalkot Rd · ₹91.8/L<br><br>'+
+    '📍 <b>Pune stretch</b><br>'+
+    '&nbsp;&nbsp;🔴 <b>BPCL Bharat Petro</b>, Urse Phata · ₹91.9/L · ATM<br>'+
+    '&nbsp;&nbsp;🟢 <b>Indian Oil</b>, Talegaon NH-48 · ₹92.1/L<br><br>'+
+    '📍 <b>Mumbai approach</b><br>'+
+    '&nbsp;&nbsp;🟡 <b>HP Auto Fuel</b>, Khopoli · ₹93.4/L · Weigh bridge<br>'+
+    '&nbsp;&nbsp;🔴 <b>BPCL</b>, Panvel NH-48 · ₹93.6/L · 24 hrs · Truck wash</div>'+
+    '<div class="coupon-box">🎟️ <b>Petrol Bunk Coupon</b><br>Use this code at any HP / BPCL on route for discounted diesel:<br><div class="coupon-code">IFP2026</div><span style="font-size:10px;">Valid at partner bunks · ₹2/L discount · Show to cashier</span></div>',
+  function(){
+    showKbd('options',{options:[
+      {t:'✅ Confirm delivery',f:enterUnloadOTP},
+      {t:'🔄 Back to trip',f:tripTransit,c:'bl'}
+    ]});
+  });
+}
+
+function enterUnloadOTP(){
+  addMsg('user','Confirm delivery');
+  say('You have arrived at the delivery point.<br><br>🔑 <b>Unloading OTP</b> — <b>you (driver)</b> hold this. Share with receiver to confirm receipt:'+
+    '<div class="otp-box">🔑 Unloading OTP (held by driver)<div class="otp-num">5 5 1 7</div><span style="font-size:10px;">Receiver enters this at unloading · Confirms goods received</span></div>',function(){
+    showKbd('options',{options:[{t:'✅ Receiver confirmed OTP',f:tripDone}]});
+  });
+}
+
+/* ─── TRIP SUMMARY CARD (shown before all ratings) ─── */
+function buildTripSummaryCard(){
+  return '<div class="card cg" style="margin-bottom:6px;">'+
+    '📋 <b>Trip Summary — Manual Entries</b><br>'+
+    '<div class="divline"></div>'+
+    '📦 Goods: <b>'+(S.loadDesc||S.matchedLoad||'–')+'</b><br>'+
+    '🚛 Truck: <b>'+(S.truckType||S.loadTruckType||'–')+'</b>'+((S.truckSize)?' · <b>'+S.truckSize+'</b>':'')+'<br>'+
+    '⚖️ Weight: <b>'+(S.loadWeight||S.truckCapacity||'–')+'</b><br>'+
+    '📍 Route: <b>'+(S.src||'–')+'</b> → <b>'+(S.dst||'–')+'</b><br>'+
+    '💰 Agreed Rate: <b>₹'+(S.matchedPrice||'–')+'</b>'+
+  '</div>';
+}
+
+function tripDone(){
+  addMsg('user','✅ Delivery confirmed');
+  setSec('✅ Trip complete · Invoice PDF · UPI settlement');
+  say('✅ <span class="chip chg">Delivery confirmed!</span>'+
+    '<div class="card cg">📄 Invoice PDF generated<br>💳 UPI settlement initiated<br>Route: '+S.src+' → '+S.dst+' · '+S.matchedLoad+'</div><br>'+
+    buildTripSummaryCard()+
+    '<b>Rate your shipper:</b>',function(){
+    var area=document.getElementById('kbd-area');area.innerHTML='';
+    renderStarRating(area,'Rate your Shipper',function(stars){
+      addMsg('user',stars+' ⭐ for shipper');
+      setTimeout(function(){
+        addMsg('bot','🔔 <b>Trip Closed Notification</b>'+
+          '<div class="trip-closed-banner">✅ <b>TRIP CLOSED</b><br>'+S.src+' → '+S.dst+' · '+S.matchedLoad+'<br>All parties have been notified.<br>Payment: Released to driver ✅</div>');
+        if(stars>=4){
+          say('⭐ Rating saved! Thank you for a great trip.<br>Browse return loads to keep moving.',function(){
+            showKbd('options',{options:[
+              {t:'🚛 Post new availability',f:startAvail},
+              {t:'🏪 Browse return loads',f:startMarket,c:'bl'}
+            ]});
+          });
+        } else {
+          say('Rating saved. Would you like to share feedback?',function(){
+            showKbd('options',{options:[
+              {t:'💬 Leave written feedback',f:function(){addMsg('user','Feedback noted');say('Thank you for your feedback. It helps improve the platform.',function(){showKbd('options',{options:[{t:'🚛 Post new availability',f:startAvail}]});});}},
+              {t:'✅ Done',f:function(){clearKbd();addMsg('bot','Session complete. Thank you!');}}
+            ]});
+          });
+        }
+      },600);
+    });
+    appendFreeBar(area);
+  });
+}
+
+/* ═══════════════════════════════════════
+   BOT 4 — SHIPPER
+═══════════════════════════════════════ */
+function startShipperKYC(){
+  setTab(4);setSec('📦 Bot 4 — Shipper: DigiLocker verification');
+  say('📦 <b>Bot 4 — Shipper</b><br>Verify your identity via DigiLocker to post loads.',function(){
+    showKbd('options',{options:[{t:'🔗 Verify via DigiLocker',f:function(){
+      addMsg('user','🔗 Verify via DigiLocker');
+      say('🔗 digilocker.gov.in/auth?ref=IFP-SHIPPER',function(){
+        showKbd('options',{options:[{t:'✅ I have authorised',f:function(){
+          addMsg('user','✅ Authorised');
+          setSec('✅ Shipper verified — post your load');
+          say('✅ <span class="chip chg">Shipper verified</span> You can now post loads.',function(){
+            showKbd('options',{options:[
+              {t:'📦 Post a new load',f:shipperGoods},
+              {t:'💾 View saved templates',f:viewTemplates,c:'bl'}
+            ]});
+          });
+        }}]});
+      });
+    }}]});
+  });
+}
+
+function shipperGoods(){
+  addMsg('user','📦 Post new load');
+  say('What type of goods are you shipping?<br><span style="font-size:10px;color:#667781;">Type freely or select below — we\'ll detect the goods type automatically</span>',function(){
+    showKbd('text',{label:'Type of Goods',placeholder:'e.g. steel coils, cotton bales, cement…',onSubmit:function(v){
+      addMsg('user',v);
+      // Parse goods from free text
+      var goodsMap={'steel coil':'Steel Coils','steel':'Steel Coils','iron':'Steel Coils','auto part':'Auto Parts','auto':'Auto Parts','spare':'Auto Parts','fmcg':'FMCG Goods','grocery':'FMCG Goods','food':'FMCG Goods','granite':'Granite Slabs','marble':'Granite Slabs','cotton':'Cotton / Textile','textile':'Cotton / Textile','cement':'Cement / Construction','chemical':'Chemicals','pharma':'Pharma / Medicine','medicine':'Pharma / Medicine','electronics':'Electronics','fruit':'Fruits & Vegetables','vegetable':'Fruits & Vegetables'};
+      var detected=null;
+      var low=v.toLowerCase();
+      Object.keys(goodsMap).forEach(function(k){if(low.indexOf(k)>=0&&!detected)detected=goodsMap[k];});
+      if(!detected)detected=v.charAt(0).toUpperCase()+v.slice(1);
+      S.loadDesc=detected;S.loadGoodsType=v;
+      say('📦 Goods detected: <b>'+detected+'</b><br><div class="card cg">✅ Parsed from your message: "<i>'+v+'</i>"<br>Using: <b>'+detected+'</b></div>',function(){
+        shipperWeight();
+      });
+    }});
+  });
+}
+
+/* Shipper: truck type → size → weight (matches trucker options + manual entry) */
+function shipperWeight(){
+  say('Select <b>truck/container type needed</b>:',function(){
+    showKbd('options',{options:[
+      {t:'🚚 Closed Container',f:function(){S.loadTruckType='Closed Container';addMsg('user','🚚 Closed Container');shipperContainerSize();}},
+      {t:'🚜 Open Body / Flatbed',f:function(){S.loadTruckType='Flatbed';addMsg('user','🚜 Flatbed / Open Body');shipperContainerSize();}},
+      {t:'🛻 Mini Truck / LCV',f:function(){S.loadTruckType='Mini Truck';addMsg('user','🛻 Mini Truck / LCV');shipperContainerSize();}},
+      {t:'🏗️ Trailer / ODC',f:function(){S.loadTruckType='Trailer';addMsg('user','🏗️ Trailer / ODC');shipperContainerSize();},c:'bl'}
+    ]});
+  });
+}
+
+function shipperContainerSize(){
+  say('Select <b>body / container size</b>:',function(){
+    showKbd('options',{options:[
+      {t:'📏 10 ft',f:function(){S.truckSize='10ft';addMsg('user','📏 10ft');shipperLoadWeight();}},
+      {t:'📏 17 ft',f:function(){S.truckSize='17ft';addMsg('user','📏 17ft');shipperLoadWeight();}},
+      {t:'📏 20 ft ⭐',f:function(){S.truckSize='20ft';addMsg('user','📏 20ft');shipperLoadWeight();},c:'bl'},
+      {t:'📏 32 ft / 40 ft',f:function(){S.truckSize='40ft';addMsg('user','📏 40ft');shipperLoadWeight();}},
+      {t:'✏️ Enter manually',f:function(){addMsg('user','Enter size manually');
+        showKbd('text',{label:'Container / Body size',placeholder:'e.g. 24ft, 48ft…',onSubmit:function(v){
+          S.truckSize=v;addMsg('user','📏 '+v);shipperLoadWeight();
+        }});
+      },c:'gr'}
+    ]});
+  });
+}
+
+function shipperLoadWeight(){
+  say('Select <b>load weight</b>:',function(){
+    showKbd('options',{options:[
+      {t:'⚖️ Up to 3T (LCV)',f:function(){S.loadWeight='3T';addMsg('user','⚖️ 3T');shipperRoute();}},
+      {t:'⚖️ 7–10T',f:function(){S.loadWeight='10T';addMsg('user','⚖️ 10T');shipperRoute();}},
+      {t:'⚖️ 12–18T',f:function(){S.loadWeight='18T';addMsg('user','⚖️ 18T');shipperRoute();}},
+      {t:'⚖️ 18–22T',f:function(){S.loadWeight='22T';addMsg('user','⚖️ 22T');shipperRoute();}},
+      {t:'⚖️ 28–35T',f:function(){S.loadWeight='35T';addMsg('user','⚖️ 35T');shipperRoute();}},
+      {t:'✏️ Enter manually',f:function(){addMsg('user','Enter weight manually');
+        showKbd('numeric',{label:'Load weight (tonnes)',hint:'e.g. 15, 22, 40',maxLen:4,onSubmit:function(v){
+          S.loadWeight=v+'T';addMsg('user','⚖️ '+v+'T');shipperRoute();
+        }});
+      },c:'gr'}
+    ]});
+  });
+}
+
+function shipperRoute(){
+  say('📍 Enter <b>pickup city</b>:',function(){
+    showKbd('city',{role:'pickup location',onConfirm:function(city,state){
+      S.src=city;S.srcState=state;
+      say('✅ Pickup: <b>'+city+(state?', '+state:'')+'</b><br><br>📍 Now enter <b>delivery city</b>:',function(){
+        showKbd('city',{role:'delivery location',onConfirm:function(c2,s2){
+          S.dst=c2;S.dstState=s2;
+          shipperConfirmPost();
+        }});
+      });
+    }});
+  });
+}
+
+function shipperConfirmPost(){
+  S.loadPosted=true;
+  var loadId='#HM-'+Math.floor(2000+Math.random()*999);
+  S.currentLoadId=loadId;
+  setSec('✅ Load posted — visible in Bot 3 Marketplace');
+  say('✅ <span class="chip chg">Load posted</span>'+
+    '<div class="card cb">📦 <b>'+S.loadDesc+'</b><br>'+
+    'Container/Truck: '+S.loadTruckType+(S.truckSize?' · '+S.truckSize:'')+'<br>'+
+    'Weight: '+S.loadWeight+'<br>'+
+    'Route: '+S.src+(S.srcState?', '+S.srcState:'')+' → '+S.dst+(S.dstState?', '+S.dstState:'')+'<br>'+
+    'Load ID: <b>'+loadId+'</b><br>'+
+    '<div class="divline"></div>'+
+    '👁️ Visible in marketplace · <span class="chip chb">Matching truckers…</span><br>'+
+    '<span class="chip cha">⏰ Auto-expires in 24 hours</span></div>'+
+    '<div class="traffic-notice">🔔 <b>A driver will be matched soon.</b> You will receive a notification the moment a driver match is confirmed.</div>',
+  function(){
+    shipperEnterPriceRange(loadId);
+  });
+}
+
+function shipperEnterPriceRange(loadId){
+  say('💰 Set your <b>minimum acceptable bid</b> (₹):<br><span style="font-size:11px;color:#667781;">Bids below this will be auto-rejected</span>',function(){
+    showKbd('numeric',{label:'Min acceptable bid (₹)',hint:'Your lowest acceptable rate',maxLen:8,onSubmit:function(mn){
+      S.smin=mn;addMsg('user','Min bid: ₹'+mn);
+      say('✅ Min set to <b>₹'+mn+'</b>. Now enter your <b>maximum budget</b> (₹):<br><span style="font-size:11px;color:#667781;">Bids above this will be flagged</span>',function(){
+        showKbd('numeric',{label:'Max budget (₹)',hint:'Your highest acceptable rate',maxLen:8,onSubmit:function(mx){
+          S.smax=mx;addMsg('user','Max bid: ₹'+mx);
+          say('✅ <span class="chip chg">Price range set</span>'+
+            '<div class="card cg">💰 Your bid range: <b>₹'+mn+'</b> – <b>₹'+mx+'</b><br>'+
+            '📢 Truckers can now submit bids within your range.<br>'+
+            '🔔 You will be notified the moment a bid arrives.</div>',function(){
+            showKbd('options',{options:[
+              {t:'⚡ Simulate bid received',f:function(){shipperBidIn(mn,mx);}},
+              {t:'💾 View saved templates',f:viewTemplates,c:'bl'}
+            ]});
+          });
+        }});
+      });
+    }});
+  });
+}
+
+function shipperBidIn(smin,smax){
+  addMsg('user','Simulate bid received');
+  var min=smin||S.smin||'65000';
+  var max=smax||S.smax||'80000';
+  var bidAmt=Math.floor((Number(min)+Number(max))/2);
+  say('🚛 <b>Bid received!</b>'+
+    '<div class="card cg">🚛 <b>Suresh Kumar</b><br>Truck: '+S.loadTruckType+(S.truckSize?' · '+S.truckSize:'')+'<br>Weight: '+S.loadWeight+'<br>🛡️ KYC: <span class="chip chg">✅ Verified</span><br>⭐ Rating: 4.8<br>'+
+    '<div class="divline"></div>'+
+    '💰 Bid Amount: <b>₹'+bidAmt+'</b><br>'+
+    'Your range: ₹'+min+' – ₹'+max+' · <span class="chip chg">✅ Within range</span></div>',function(){
+    showKbd('options',{options:[
+      {t:'✅ Accept match',f:function(){shipperAccept(bidAmt);}},
+      {t:'⏭️ Wait for more bids',f:function(){addMsg('user','Wait for more');say('Waiting for more bids…<br>🔔 You will be notified when more bids come in.',function(){showKbd('options',{options:[{t:'⚡ Next bid',f:function(){shipperBidIn(min,max);}}]});});},c:'bl'},
+      {t:'❌ Reject bid',f:function(){addMsg('user','Reject');say('Bid rejected. Continuing search…',function(){showKbd('options',{options:[{t:'⚡ Next bid',f:function(){shipperBidIn(min,max);}}]});});},c:'rd'}
+    ]});
+  });
+}
+
+function shipperAccept(bidAmt){
+  var agreedPrice=bidAmt||S.matchedPrice||'72000';
+  S.matchedPrice=agreedPrice;
+  addMsg('user','✅ Accept match');unlockTab(5);setTab(5);
+  setSec('✅ Match accepted → Bot 5 Billing · Loading OTP');
+  say('✅ <span class="chip chg">Match confirmed!</span><br>'+
+    '<div class="card cg" style="margin-bottom:6px;">💰 Agreed Rate: <b>₹'+agreedPrice+'</b><br>📦 Load: <b>'+S.loadDesc+'</b><br>🚛 Truck: '+S.loadTruckType+(S.truckSize?' · '+S.truckSize:'')+'<br>📍 '+S.src+' → '+S.dst+'</div>'+
+    'Driver en route to pickup.<br><br>🔑 <b>Loading OTP — you (shipper) must enter this at pickup.</b> Driver will notify you when goods are loaded:'+
+    '<div class="otp-box">🔑 Loading OTP (Shipper enters this)<div class="otp-num">8 8 4 2</div><span style="font-size:10px;">Driver will notify you — enter this OTP at pickup gate to confirm loading</span></div>'+
+    '<br><span class="live-dot"></span> <b>Live location sharing is active</b> — you will see driver\'s location automatically.',function(){
+    showKbd('options',{options:[
+      {t:'✅ Enter OTP · Confirm pickup',f:function(){addMsg('user','✅ OTP 8842 entered · Pickup confirmed');shipperTransit();}},
+      {t:'🚨 Raise Dispute',f:function(){shipperRaiseDispute('loading');},c:'rd'}
+    ]});
+  });
+}
+
+function shipperRaiseDispute(stage){
+  addMsg('user','🚨 Raise Dispute');
+  var context=stage==='loading'?'Issue at <b>loading / pickup</b> stage':stage==='transit'?'Issue during <b>transit</b>':'Issue at <b>delivery</b> stage';
+  say('🚨 <b>Raise a Dispute</b><br>'+context+'<br><br>Select dispute reason:',function(){
+    showKbd('options',{options:[
+      {t:'📦 Goods damaged / missing',f:function(){addMsg('user','Goods damaged/missing');disputeSubmit('Goods damaged or missing at '+stage);}},
+      {t:'⚖️ Wrong weight loaded',f:function(){addMsg('user','Wrong weight');disputeSubmit('Weight mismatch at '+stage);}},
+      {t:'🕐 Unreasonable delay',f:function(){addMsg('user','Delay issue');disputeSubmit('Driver delayed beyond agreed time');}},
+      {t:'✍️ Other issue',f:function(){addMsg('user','Other');disputeSubmit('Other dispute raised by shipper at '+stage);},c:'bl'}
+    ]});
+  });
+}
+
+function disputeSubmit(reason){
+  setSec('🚨 Dispute raised · Support team notified');
+  say('🚨 <span class="chip chr">Dispute raised</span>'+
+    '<div class="card cb">📋 Reason: '+reason+'<br>🆔 Ticket: <b>#DSP-'+Math.floor(1000+Math.random()*9000)+'</b><br>👤 Support team notified<br>⏱️ Response within 2 hours<br>💳 Payment on hold until resolved</div>',function(){
+    showKbd('options',{options:[
+      {t:'🔄 Continue shipment',f:shipperTransit,c:'bl'},
+      {t:'📦 Post new load',f:shipperGoods}
+    ]});
+  });
+}
+
+function shipperRaiseDisputePostClose(){
+  addMsg('user','🚨 Raise Dispute');
+  say('🚨 <b>Raise a Dispute</b><br>Issue after <b>trip closed</b> · <span style="color:#a32d2d;">⏰ Within 24-hour dispute window</span><br><br>Select your issue:',function(){
+    showKbd('options',{options:[
+      {t:'🕐 Delay related',f:function(){addMsg('user','Delay related');disputeSubmitPostClose('Delay related issue — trip closed dispute');}},
+      {t:'📦 Goods misplaced',f:function(){addMsg('user','Goods misplaced');disputeSubmitPostClose('Goods misplaced — reported after trip closed');}},
+      {t:'🚚 Delivery delay',f:function(){addMsg('user','Delivery delay');disputeSubmitPostClose('Delivery delay — reported after trip closed');}},
+      {t:'✍️ Other',f:function(){
+        addMsg('user','Other');
+        setSec('🚨 Dispute raised · Support team notified');
+        say('🚨 <span class="chip chr">Dispute raised</span>'+
+          '<div class="card cb">'+
+          '📋 Reason: Other (post-trip dispute)<br>'+
+          '🆔 Ticket: <b>#DSP-'+Math.floor(1000+Math.random()*9000)+'</b><br>'+
+          '<div class="divline"></div>'+
+          '👤 <b>Support Team Message:</b><br>'+
+          '<div style="background:#f7fdf9;border:1px solid #9FE1CB;border-radius:8px;padding:8px 10px;margin-top:5px;font-size:11.5px;color:#085041;">'+
+          '🙏 Dear Shipper,<br><br>'+
+          'We have received your dispute. Our team will investigate the unload payment and driver issue promptly.<br><br>'+
+          '💳 <b>Unload payment for the driver will be resolved</b> as part of this dispute process — both shipper and receiver will be notified once the review is complete.<br><br>'+
+          '⏱️ Expected resolution: within <b>2–4 hours</b><br>'+
+          '📞 Support will contact you on your registered number.</div>'+
+          '</div>',function(){
+          showKbd('options',{options:[
+            {t:'🔄 Done',f:function(){clearKbd();addMsg('bot','Session complete. Support will contact you shortly.');}}
+          ]});
+        });
+      },c:'bl'}
+    ]});
+  });
+}
+
+function disputeSubmitPostClose(reason){
+  setSec('🚨 Dispute raised · Support team notified');
+  say('🚨 <span class="chip chr">Dispute raised</span>'+
+    '<div class="card cb">📋 Reason: '+reason+'<br>🆔 Ticket: <b>#DSP-'+Math.floor(1000+Math.random()*9000)+'</b><br>👤 Support team notified<br>⏱️ Response within 2 hours<br>💳 Payment on hold until resolved</div>',function(){
+    showKbd('options',{options:[
+      {t:'🔄 Done',f:function(){clearKbd();addMsg('bot','Session complete. Support will contact you shortly.');}}
+    ]});
+  });
+}
+
+function shipperTransit(){
+  addMsg('user','✅ OTP confirmed · Pickup done');
+  say('🚛 Shipment in transit.'+
+    '<div class="card cb">📡 <span class="live-dot"></span> Live tracking: <span class="chip chg">Active · Sharing automatically</span><br>📣 Status updates every 3 hours</div>',function(){
+    showKbd('options',{options:[
+      {t:'📍 Request location update',f:function(){
+        addMsg('user','Location update');
+        say('📍 Driver near <b>Pune bypass</b>. ETA: 4 hours.<br><span class="live-dot"></span> Live location active.',function(){
+          showKbd('options',{options:[
+            {t:'✅ Simulate delivery',f:shipperDelivered},
+            {t:'🚨 Raise Dispute',f:function(){shipperRaiseDispute('transit');},c:'rd'}
+          ]});
+        });
+      }},
+      {t:'✅ Simulate delivery',f:shipperDelivered,c:'bl'},
+      {t:'🚨 Raise Dispute',f:function(){shipperRaiseDispute('transit');},c:'rd'}
+    ]});
+  });
+}
+
+function shipperDelivered(){
+  addMsg('user','Simulate delivery');
+  setSec('✅ Delivered · Invoice PDF · UPI settlement');
+  say('✅ <span class="chip chg">Delivered!</span> Receiver confirmed unloading OTP.<br>'+
+    '<div class="card cg">📄 Auto invoice PDF generated<br>💳 UPI payment settlement triggered</div><br>'+
+    buildTripSummaryCard()+
+    '<b>Rate your driver:</b>',function(){
+    var area=document.getElementById('kbd-area');area.innerHTML='';
+    renderStarRating(area,'Rate your Driver',function(stars){
+      addMsg('user',stars+' ⭐ for driver');
+      if(stars>=4){
+        say('⭐ Rating saved! Thank you.',function(){
+          say('🔔 <b>Before we close this trip</b> — do you have any issue to report?<br><span style="font-size:11px;color:#667781;">⏰ This is your <b>24-hour window</b> to raise a dispute before the trip is closed.</span>',function(){
+            showKbd('options',{options:[
+              {t:'🚨 Raise Dispute',f:function(){shipperRaiseDisputePostClose();},c:'rd'},
+              {t:'✅ No issue · Close trip',f:function(){
+                addMsg('user','No issue · Close trip');
+                say('🔔 <b>Trip Closed</b>'+
+                  '<div class="trip-closed-banner">✅ <b>TRIP CLOSED</b><br>'+S.src+' → '+S.dst+' · '+S.loadDesc+'<br>All parties notified: Shipper ✅ · Driver ✅ · Receiver ✅<br>Payment Released ✅</div>',function(){
+                  showKbd('options',{options:[
+                    {t:'📦 Post new load',f:shipperGoods},
+                    {t:'💾 Save as template',f:function(){saveShipperTemplate();},c:'bl'},
+                    {t:'🗂️ View saved templates',f:viewTemplates,c:'pu'}
+                  ]});
+                });
+              }}
+            ]});
+          });
+        });
+      } else {
+        say('Rating saved. Would you like to add written feedback?',function(){
+          S.disputeWindow=true;
+          if(S.disputeTimer)clearTimeout(S.disputeTimer);
+          S.disputeTimer=setTimeout(function(){S.disputeWindow=false;},24000);
+          showKbd('options',{options:[
+            {t:'💬 Add feedback',f:function(){addMsg('user','Feedback noted');
+              say('Thank you. Feedback helps us improve.',function(){
+                say('🔔 <b>Trip Closed</b><div class="trip-closed-banner">✅ TRIP CLOSED · All parties notified</div>',function(){
+                  showKbd('options',{options:[
+                    {t:'📦 Post load',f:shipperGoods},
+                    {t:'💾 Save template',f:saveShipperTemplate,c:'bl'}
+                  ]});
+                });
+              });
+            }},
+            {t:'🚨 Raise Dispute',f:function(){shipperRaiseDispute('delivery');},c:'rd'},
+            {t:'✅ Done',f:function(){clearKbd();addMsg('bot','Session complete. You have <b>24 hours</b> to raise a dispute if needed.');}}
+          ]});
+        });
+      }
+    });
+    appendFreeBar(area);
+  });
+}
+
+/* ─── SAVE TEMPLATE ─── */
+function saveShipperTemplate(){
+  addMsg('user','💾 Save as template');
+  var tpl={
+    id:'TPL-'+Math.floor(1000+Math.random()*9000),
+    goods:S.loadDesc,truckType:S.loadTruckType,size:S.truckSize||'',
+    weight:S.loadWeight,src:S.src,srcState:S.srcState,dst:S.dst,dstState:S.dstState,
+    driver:'Suresh Kumar',driverRating:'4.8',date:new Date().toLocaleDateString('en-IN')
+  };
+  S.savedTemplates.push(tpl);
+  say('💾 <span class="chip chp">Template saved!</span>'+
+    '<div class="template-card">🗂️ <b>Template '+tpl.id+'</b><br>'+
+    '📦 '+tpl.goods+' · '+tpl.weight+'<br>'+
+    '🚛 '+tpl.truckType+(tpl.size?' · '+tpl.size:'')+' · Route: '+tpl.src+' → '+tpl.dst+'<br>'+
+    'Driver: '+tpl.driver+' · ⭐ '+tpl.driverRating+'<br>'+
+    '📅 '+tpl.date+'</div>',function(){
+    showKbd('options',{options:[
+      {t:'📦 Post new load',f:shipperGoods},
+      {t:'🗂️ View all templates',f:viewTemplates,c:'bl'}
+    ]});
+  });
+}
+
+function viewTemplates(){
+  addMsg('user','🗂️ View saved templates');
+  if(!S.savedTemplates||S.savedTemplates.length===0){
+    say('📭 No saved templates yet.<br>Complete a trip and tap <b>Save Template</b> to store load & route details.',function(){
+      showKbd('options',{options:[{t:'📦 Post a new load',f:shipperGoods}]});
+    });return;
+  }
+  var html='🗂️ <b>Saved Load Templates</b><br>';
+  S.savedTemplates.forEach(function(t){
+    html+='<div class="template-card" style="margin-top:5px;">🗂️ <b>'+t.id+'</b> · 📅 '+t.date+'<br>'+
+      '📦 '+t.goods+' · '+t.weight+'<br>'+
+      '🚛 '+t.truckType+(t.size?' · '+t.size:'')+' · '+t.src+' → '+t.dst+'<br>'+
+      '👤 Driver: '+t.driver+' · ⭐ '+t.driverRating+'<br>'+
+      '<span style="font-size:10px;color:#667781;">(Phone number hidden for privacy)</span></div>';
+  });
+  say(html,function(){
+    showKbd('options',{options:[
+      {t:'📦 Post new load (from template)',f:function(){addMsg('user','Use template');S.loadDesc=S.savedTemplates[0].goods;S.loadTruckType=S.savedTemplates[0].truckType;S.truckSize=S.savedTemplates[0].size;S.loadWeight=S.savedTemplates[0].weight;S.src=S.savedTemplates[0].src;S.srcState=S.savedTemplates[0].srcState;S.dst=S.savedTemplates[0].dst;S.dstState=S.savedTemplates[0].dstState;shipperConfirmPost();}},
+      {t:'🔙 Back',f:shipperGoods,c:'bl'}
+    ]});
+  });
+}
+
+/* ═══════════════════════════════════════
+   RECEIVER FLOW
+═══════════════════════════════════════ */
+function startReceiverKYC(){
+  setTab(1);setSec('🏠 Receiver — DigiLocker verification');
+  say('🏠 <b>Receiver</b><br>Verify your identity to access your incoming shipment.',function(){
+    showKbd('options',{options:[{t:'🔗 Verify via DigiLocker',f:function(){
+      addMsg('user','🔗 Verify via DigiLocker');
+      say('🔗 digilocker.gov.in/auth?ref=IFP-RECV',function(){
+        showKbd('options',{options:[{t:'✅ I have authorised',f:function(){
+          addMsg('user','✅ Authorised');
+          say('✅ <span class="chip chg">Verified</span> Your incoming shipment is ready to view.',function(){
+            showKbd('options',{options:[{t:'📦 View shipment details',f:receiverDetails}]});
+          });
+        }}]});
+      });
+    }}]});
+  });
+}
+
+function receiverDetails(){
+  addMsg('user','📦 View shipment details');
+  say('<div class="card cb">📦 <b>Incoming: '+(S.loadDesc||'Steel Coils')+' · '+(S.loadWeight||'22T')+'</b><br>🚛 Truck: '+(S.loadTruckType||'Closed Container')+(S.truckSize?' · '+S.truckSize:'')+'<br>👤 Driver: Suresh Kumar · ⭐ 4.8<br>📍 From: '+(S.src||'Hyderabad')+' · ETA: 4 hours<br><span class="live-dot"></span> Live tracking: <span class="chip chg">Active</span><br>Status: <span class="chip chg">✅ On time</span></div>',function(){
+    showKbd('options',{options:[
+      {t:'✅ Confirm delivery (enter OTP)',f:receiverOTPEntry},
+      {t:'📍 Request location update',f:function(){
+        addMsg('user','Location update');
+        say('📍 Driver near <b>Pune bypass</b>. ETA: 4 hours.<br><span class="live-dot"></span> Live location active automatically.',function(){
+          showKbd('options',{options:[
+            {t:'✅ Confirm delivery',f:receiverOTPEntry},
+            {t:'🚨 Raise Dispute',f:receiverRaiseDispute,c:'rd'}
+          ]});
+        });
+      },c:'bl'},
+      {t:'🚨 Raise Dispute',f:receiverRaiseDispute,c:'rd'}
+    ]});
+  });
+}
+
+function receiverOTPEntry(){
+  addMsg('user','Confirm delivery');
+  say('Enter the <b>Unloading OTP</b> provided by the driver (try: <b>5517</b>):',function(){
+    showKbd('otp',{label:'Unloading OTP',onSubmit:function(v){
+      addMsg('user','Unloading OTP: '+v);
+      setSec('✅ Delivery confirmed · Rating pending');
+      var freight=S.matchedPrice||'72000';
+      var gst=Math.round(Number(freight)*0.05);
+      var total=Number(freight)+gst;
+      say('✅ <span class="chip chg">Delivery confirmed!</span> Goods received.<br>'+
+        '<div class="card cg">'+
+          '📄 <b>Delivery Receipt Generated</b><br>'+
+          '<div class="divline"></div>'+
+          '📦 Goods: <b>'+(S.loadDesc||'Steel Coils')+'</b> · '+(S.loadWeight||'22T')+'<br>'+
+          '🚛 Truck: '+(S.loadTruckType||'Closed Container')+(S.truckSize?' · '+S.truckSize:'')+'<br>'+
+          '📍 Route: '+(S.src||'Hyderabad')+' → '+(S.dst||'Mumbai')+'<br>'+
+          '<div class="divline"></div>'+
+          '💰 Freight Charge: <b>₹'+freight+'</b><br>'+
+          '🧾 GST (5%): <b>₹'+gst+'</b><br>'+
+          '💳 <b>Total Payable: ₹'+total+'</b><br>'+
+          '<div class="divline"></div>'+
+          '✅ <span style="color:#0F6E56;font-weight:600;">💸 Payment Released to Driver</span><br>'+
+          '<span style="font-size:10px;color:#667781;">UPI settlement triggered · Driver notified ✅</span>'+
+        '</div><br>'+
+        '<b>Rate your driver:</b>',function(){
+        var area=document.getElementById('kbd-area');area.innerHTML='';
+        renderStarRating(area,'Rate your Driver',function(stars){
+          addMsg('user',stars+' ⭐ for driver');
+          if(stars>=4){
+            say('⭐ Thank you! Rating saved.',function(){
+              say('🔔 <b>Trip Closed Notification</b>'+
+                '<div class="trip-closed-banner">✅ <b>TRIP CLOSED</b><br>Your delivery has been completed successfully.<br>Driver · Shipper · Receiver — all notified ✅</div>',function(){
+                showKbd('options',{options:[
+                  {t:'📦 Post return load',f:function(){ROLE='shipper';setSub('Shipper mode');setTopTag('📦','Shipper');unlockTab(4);setTab(4);startShipperKYC();}},
+                  {t:'💾 Save template',f:function(){saveReceiverTemplate();},c:'bl'},
+                  {t:'🔄 Done',f:function(){clearKbd();addMsg('bot','Session complete. Thank you!');}}
+                ]});
+              });
+            });
+          } else {
+            say('Rating saved.',function(){
+              showKbd('options',{options:[
+                {t:'💾 Save template',f:function(){saveReceiverTemplate();},c:'bl'},
+                {t:'🔄 Done',f:function(){
+                  say('🔔 <b>Trip Closed</b><div class="trip-closed-banner">✅ TRIP CLOSED · All parties notified</div>',function(){
+                    clearKbd();addMsg('bot','Session complete!');
+                  });
+                }}
+              ]});
+            });
+          }
+        });
+        appendFreeBar(area);
+      });
+    }});
+  });
+}
+
+function saveReceiverTemplate(){
+  addMsg('user','💾 Save template');
+  var tpl={
+    id:'TPL-'+Math.floor(1000+Math.random()*9000),
+    goods:S.loadDesc||'Steel Coils',truckType:S.loadTruckType||'Closed Container',size:S.truckSize||'20ft',
+    weight:S.loadWeight||'22T',src:S.src||'Hyderabad',dst:S.dst||'Mumbai',
+    driver:'Suresh Kumar',driverRating:'4.8',date:new Date().toLocaleDateString('en-IN')
+  };
+  S.savedTemplates.push(tpl);
+  say('💾 <span class="chip chp">Return load template saved!</span>'+
+    '<div class="template-card">🗂️ <b>Template '+tpl.id+'</b><br>'+
+    '📦 '+tpl.goods+' · '+tpl.weight+'<br>'+
+    '🚛 '+tpl.truckType+' · '+tpl.size+' · '+tpl.src+' → '+tpl.dst+'<br>'+
+    '⭐ Driver rating: '+tpl.driverRating+' (phone hidden)<br>'+
+    '📅 '+tpl.date+'<br>'+
+    '<span style="font-size:10px;color:#667781;">Use this template to post a return load quickly.</span></div>',function(){
+    showKbd('options',{options:[
+      {t:'📦 Post return load',f:function(){ROLE='shipper';setSub('Shipper mode');setTopTag('📦','Shipper');unlockTab(4);setTab(4);startShipperKYC();}},
+      {t:'🔄 Done',f:function(){clearKbd();addMsg('bot','Session complete. Thank you!');}}
+    ]});
+  });
+}
+
+function receiverRaiseDispute(){
+  addMsg('user','🚨 Raise Dispute');
+  say('🚨 <b>Raise a Dispute</b><br>Issue at <b>delivery / unloading</b> stage<br><br>Select dispute reason:',function(){
+    showKbd('options',{options:[
+      {t:'📦 Goods damaged / missing',f:function(){addMsg('user','Goods damaged');receiverDisputeSubmit('Goods damaged or missing at delivery');}},
+      {t:'⚖️ Wrong quantity received',f:function(){addMsg('user','Wrong quantity');receiverDisputeSubmit('Quantity mismatch at unloading');}},
+      {t:'🕐 Late delivery',f:function(){addMsg('user','Late delivery');receiverDisputeSubmit('Delivery was significantly delayed');}},
+      {t:'✍️ Other issue',f:function(){addMsg('user','Other');receiverDisputeSubmit('Other dispute raised by receiver at unloading');},c:'bl'}
+    ]});
+  });
+}
+
+function receiverDisputeSubmit(reason){
+  setSec('🚨 Dispute raised · Support team notified');
+  say('🚨 <span class="chip chr">Dispute raised</span>'+
+    '<div class="card cb">📋 Reason: '+reason+'<br>🆔 Ticket: <b>#DSP-'+Math.floor(1000+Math.random()*9000)+'</b><br>👤 Support team notified<br>⏱️ Response within 2 hours<br>💳 Payment on hold until resolved</div>',function(){
+    showKbd('options',{options:[
+      {t:'🔄 Done',f:function(){clearKbd();addMsg('bot','Session complete. Support will contact you shortly.');}}
+    ]});
+  });
+}
+
+startScreen();
+})();
+</script>
+</body>
+</html>
