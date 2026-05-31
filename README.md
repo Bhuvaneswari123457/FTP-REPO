@@ -7,3 +7,6 @@ Scope of Execution: Designed the distributed system patterns, engineered the int
 
 🗺️ Functional User Flow & Structural Logic
 The platform directs three distinct structural personas (Driver, Shipper, and Receiver) through a strictly state-gated transaction path[cite: 1]:
+
+Check the live demo:
+https://bhuvaneswari123457.github.io/FTP-REPO/
