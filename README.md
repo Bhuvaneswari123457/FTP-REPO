@@ -10,3 +10,7 @@ The platform directs three distinct structural personas (Driver, Shipper, and Re
 
 Check the live demo:
 https://bhuvaneswari123457.github.io/FTP-REPO/
+
+
+🚀 Core Contribution Summary
+As the sole technical owner of the MVP phase, I managed the entire development lifecycle—translating abstract business requirements into conversational logic, designing the system routing architecture, writing the relational state tracking schema, and coding the interactive simulation frontend.
